@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Hans!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: rgb(255, 132, 0);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .birthday-message {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .upload-btn {
+            background-color: white;
+            color: rgb(255, 132, 0);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        .upload-btn:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            aspect-ratio: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            padding: 40px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .birthday-message {
+                font-size: 1.2rem;
+            }
+            
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Happy Birthday HansyFansyPantsy!</h1>
+            <p class="birthday-message">You should kill yourself!(jk I love u)</p>
+        </div>
+
+        <div class="upload-section">
+            <p>Add your pictures of hans</p>
+            <input type="file" id="file-input" accept="image/*" multiple>
+            <label for="file-input" class="upload-btn">Upload Images</label>
+        </div>
+
+        <div class="gallery" id="image-gallery">
+            <div class="empty-state">No images yet. Upload some to get started!</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file-input');
+            const gallery = document.getElementById('image-gallery');
+            
+            // Load previously uploaded images from localStorage
+            loadSavedImages();
+            
+            fileInput.addEventListener('change', function(event) {
+                const files = event.target.files;
+                
+                if (files.length > 0) {
+                    // Remove empty state if it exists
+                    const emptyState = gallery.querySelector('.empty-state');
+                    if (emptyState) {
+                        emptyState.remove();
+                    }
+                    
+                    // Process each file
+                    Array.from(files).forEach(file => {
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            
+                            reader.onload = function(e) {
+                                addImageToGallery(e.target.result);
+                                saveImageToStorage(e.target.result);
+                            };
+                            
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                    
+                    // Reset the input to allow uploading the same file again
+                    fileInput.value = '';
+                }
+            });
+            
+            function addImageToGallery(imageData) {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                
+                const img = document.createElement('img');
+                img.src = imageData;
+                img.alt = 'Birthday wish for Hans';
+                
+                galleryItem.appendChild(img);
+                gallery.appendChild(galleryItem);
+            }
+            
+            function saveImageToStorage(imageData) {
+                // Get existing images or initialize empty array
+                let savedImages = JSON.parse(localStorage.getItem('hansBirthdayImages')) || [];
+                
+                // Add new image
+                savedImages.push(imageData);
+                
+                // Save back to localStorage
+                localStorage.setItem('hansBirthdayImages', JSON.stringify(savedImages));
+            }
+            
+            function loadSavedImages() {
+                const savedImages = JSON.parse(localStorage.getItem('hansBirthdayImages'));
+                
+                if (savedImages && savedImages.length > 0) {
+                    // Remove empty state if it exists
+                    const emptyState = gallery.querySelector('.empty-state');
+                    if (emptyState) {
+                        emptyState.remove();
+                    }
+                    
+                    // Add all saved images to gallery
+                    savedImages.forEach(imageData => {
+                        addImageToGallery(imageData);
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
